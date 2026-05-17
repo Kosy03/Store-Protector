@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 15
+names: ['alsaewoochip', 'bananakick', 'beoljippizza', 'concho', 'honeybutterchip', 'kkokkalcon_goso', 'kkotgaerang', 'kkulkkwabaegi', 'matdongsan', 'ojingeojib', 'osatsu', 'pokachip_origin', 'postick', 'potaetochip', 'saewookkang_spicy']
+
+roboflow:
+  workspace: project-g5e6o
+  project: snack-f9pig
+  version: 4
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/project-g5e6o/snack-f9pig/dataset/4
