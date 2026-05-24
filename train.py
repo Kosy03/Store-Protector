@@ -3,10 +3,10 @@ from ultralytics import YOLO
 import cv2
 
 # ─── 모델 로드 ────────────────────────────────────────────
-model = YOLO("models/old_best.pt")  # Colab에서 받은 old_best.pt 경로
+model = YOLO("models/best.pt")
 
 # ─── 사진 불러오기 ────────────────────────────────────────
-image_path = "test_images/snack4.jpg"  # 테스트할 사진 경로
+image_path = "test_images/snack.jpg"  # 테스트할 사진 경로
 frame = cv2.imread(image_path)
 
 # ─── 추론 ─────────────────────────────────────────────────
