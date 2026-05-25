@@ -3,7 +3,7 @@ from ultralytics import YOLO
 import cv2
 
 # ─── 모델 로드 ────────────────────────────────────────────
-model = YOLO("models/best.pt")
+model = YOLO("models/best_v1.pt")
 
 # ─── 사진 불러오기 ────────────────────────────────────────
 image_path = "test_images/snack.jpg"  # 테스트할 사진 경로

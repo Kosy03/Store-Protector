@@ -55,7 +55,7 @@ st.markdown("---")
 if "current_sensitivity" not in st.session_state:
     st.session_state.current_sensitivity = "보통"
 if "current_conf" not in st.session_state:
-    st.session_state.current_conf = 0.4
+    st.session_state.current_conf = 0.25
 
 # ─── 상단 레이아웃 ───────────────────────────────────────
 col1, col2 = st.columns(2)
@@ -66,18 +66,21 @@ with col1:
 
 
     @st.fragment
-    def render_sensitivity_setting():
-        selected = st.selectbox(
-            "민감도 수준", options=["낮음", "보통", "높음"],
-            index=["낮음", "보통", "높음"].index(st.session_state.current_sensitivity),
-            key="sensitivity_selector"
+    def render_threshold_slider():
+        # 슬라이더 추가: 최소 0.0, 최대 1.0, 초기값 0.25, 간격 0.05
+        conf = st.slider(
+            "Confidence 임계값 설정",
+            min_value=0.0,
+            max_value=1.0,
+            value=st.session_state.current_conf,
+            step=0.05
         )
-        st.session_state.current_sensitivity = selected
-        st.session_state.current_conf = SENSITIVITY_MAP[selected]
-        st.caption(f"현재 confidence 임계값: {st.session_state.current_conf}")
+        st.session_state.current_conf = conf
+        st.caption(f"현재 설정된 값: {st.session_state.current_conf}")
 
 
-    render_sensitivity_setting()
+    render_threshold_slider()
+
 
 with col2:
     st.subheader("B화면: 계산대 상품 인식")
@@ -111,7 +114,7 @@ with st.sidebar:
     render_sidebar_status()
 
 # ─── 🚀 영상 처리 및 AI 추론 루프 ───────────────────────
-model = YOLO("models/best.pt")
+model = YOLO("models/best_v1.pt")
 snack_names = model.names
 
 video_path = "videos/topview_snack.mp4"

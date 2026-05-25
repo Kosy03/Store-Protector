@@ -9,7 +9,7 @@ LABEL_MAP = {
 }
 
 # ─── 모델 로드 ───────────────────────────────────────────
-snack_model = YOLO("models/best.pt")
+snack_model = YOLO("models/best_v1.pt")
 snack_names = snack_model.names
 
 # ─── 결과 저장 딕셔너리 ───────────────────────────────────
