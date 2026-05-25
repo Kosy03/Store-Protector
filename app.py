@@ -31,7 +31,7 @@ def iou(box1, box2):
     return inter / union if union > 0 else 0
 
 
-def deduplicate_by_iou(boxes_raw, iou_threshold=0.5):
+def deduplicate_by_iou(boxes_raw, iou_threshold=0.3):
     kept = []
     boxes_raw = sorted(boxes_raw, key=lambda x: -x[5])
     for candidate in boxes_raw:
@@ -161,13 +161,14 @@ while cap.isOpened():
             x1, y1, x2, y2 = map(int, box.xyxy[0])
             raw_boxes.append((int(x1 * sx), int(y1 * sy), int(x2 * sx), int(y2 * sy), label, conf, (0, 200, 0)))
 
-        last_boxes = deduplicate_by_iou(raw_boxes, iou_threshold=0.5)
+        last_boxes = deduplicate_by_iou(raw_boxes, iou_threshold=0.3)
         last_detected = sorted([LABEL_MAP.get(b[4], b[4]) for b in last_boxes])
 
     # ─── 바운딩 박스 그리기 ───────────────────────
     for (x1, y1, x2, y2, label, conf, color) in last_boxes:
         cv2.rectangle(display, (x1, y1), (x2, y2), color, 2)
-        cv2.putText(display, f"{LABEL_MAP.get(label, label)} {conf:.2f}", (x1, y1 - 8),
+        #  LABEL_MAP을 빼고 원래 영어 label 변수를 그대로 출력합니다.
+        cv2.putText(display, f"{label} {conf:.2f}", (x1, y1 - 8),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
     # ✅ B화면 영상 표시
