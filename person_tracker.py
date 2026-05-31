@@ -1,53 +1,80 @@
 import cv2
+import time
 from ultralytics import YOLO
-
+#UI에서 설정한 conf값으로 맞춰야하는데, 성능 테스트를 위해서 그 기능은 배제하고 만들었어요.
+#나중에 테스트 영상들에서 원하던 결과가 나오고 나서 추가하면 될 것 같아요.
 
 class PersonTracker:
     def __init__(self, roi_ratio=[0.73, 0.50, 0.99, 0.66]):
-        # 사람 탐지용 모델 로드
         self.model = YOLO("yolov8n.pt")
-        # 관심구역 비율 저장
         self.roi_ratio = roi_ratio
+
+        #변수 3개
+        self.is_person_inside = False
+        self.visited_kiosk = False
+        self.last_seen_time = 0
 
     def process_frame(self, frame):
         h, w, _ = frame.shape
-        # 관심구역 픽셀 좌표 계산
         roi_x1 = int(w * self.roi_ratio[0])
         roi_y1 = int(h * self.roi_ratio[1])
         roi_x2 = int(w * self.roi_ratio[2])
         roi_y2 = int(h * self.roi_ratio[3])
 
-        # YOLO 추적 실행
-        results = self.model.track(frame, persist=True, classes=[0], conf=0.6, verbose=False)
+        results = self.model.track(frame, persist=True, classes=[0], conf=0.45, verbose=False)
 
         zone_triggered = False
+        theft_detected = False
+        current_time = time.time()
 
-        # 사람이 한 명이라도 탐지되었다면 발 위치 체크
+        # 현재 프레임에 사람이 한 명이라도 잡혔는지 확인하는 변수
+        person_detected_now = False
+
+        annotated_frame = results[0].plot()
+
         if results[0].boxes is not None and len(results[0].boxes) > 0:
+            person_detected_now = True
+
+            # 방금 매장에 처음 들어온 상태라면 변수 초기화
+            if not self.is_person_inside:
+                self.is_person_inside = True
+                self.visited_kiosk = False
+
+            # 사람이 보이니까 마지막 목격 시간 계속 업데이트!
+            self.last_seen_time = current_time
+
+            # ID가 튀든 말든 상관없이, 잡힌 사람 중 아무나 구역을 밟으면 OK
             for box in results[0].boxes:
                 if box.xyxy is not None:
                     xyxy = box.xyxy[0].tolist()
                     x1, y1, x2, y2 = map(int, xyxy)
 
-                    # 사각형 박스의 하단 중앙을 발 위치로 지정
                     foot_x = int((x1 + x2) / 2)
                     foot_y = y2
 
-                    # 발이 관심구역 사각형 내부에 들어왔는지 검사
                     if roi_x1 < foot_x < roi_x2 and roi_y1 < foot_y < roi_y2:
+                        self.visited_kiosk = True
                         zone_triggered = True
 
-        # 시각화용 배경 프레임 가져오기
-        annotated_frame = results[0].plot()
+        #화면에서 사람이 안 보이면 검사
+        if not person_detected_now and self.is_person_inside:
+            elapsed_time = current_time - self.last_seen_time
 
-        # 박스 위에 관심구역 사각형과 텍스트 그리기
+            # 5초 유예시간이 끝났는데도 안 돌아왔다면
+            if elapsed_time > 5.0:
+                # 키오스크 안 들르고 5초 이상 사라짐 = 도난 확정!
+                if not self.visited_kiosk:
+                    theft_detected = True
+
+                # 사람이 완전히 나갔으므로 다음 사람을 위해 변수 리셋
+                self.is_person_inside = False
+                self.visited_kiosk = False
+
         cv2.rectangle(annotated_frame, (roi_x1, roi_y1), (roi_x2, roi_y2), (255, 0, 0), 2)
         cv2.putText(annotated_frame, "Kiosk Zone", (roi_x1, roi_y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
 
-        # 구역 진입 성공 시 화면에 표시
-        if zone_triggered:
-            cv2.putText(annotated_frame, "CUSTOMER DETECTED", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 3)
+        if theft_detected:
+            cv2.putText(annotated_frame, "THEFT WARNING", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
 
-        # 색상 변환 후 신호값과 함께 리턴
         rgb_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
-        return rgb_frame, zone_triggered
+        return rgb_frame, zone_triggered, theft_detected

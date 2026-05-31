@@ -65,7 +65,6 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("A화면: 매장 전경 및 행동 분석")
-    # 💡 수정 포인트 1: 정지 이미지를 지우고 카메라 A 영상이 재생될 빈 공간을 만듭니다.
     a_frame = st.empty()
 
 
@@ -120,12 +119,14 @@ with st.sidebar:
 # 초기화 시 관심구역 비율을 발 위치에 맞게 깔끔하게 넘겨줍니다
 tracker = PersonTracker(roi_ratio=[0.73, 0.50, 0.99, 0.66])
 
-video_a_path = "videos/cctv_view.mp4"
+video_a_path = "videos/theft_video.mp4"
 cap_a = cv2.VideoCapture(video_a_path)
 
 b_status_msg.info("⏳ 고객의 키오스크 접근을 대기 중입니다...")
 
+#필요한 변수 선언
 frame_count_a = 0
+go_to_kiosk = False#키오스크 방문 여부 flag
 
 while cap_a.isOpened():
     ret_a, frame_a = cap_a.read()
@@ -136,15 +137,29 @@ while cap_a.isOpened():
     if frame_count_a % 3 != 0:
         continue
 
-        # 💡 수정된 부분: 이미지와 함께 구역 진입 여부 신호를 받아옵니다
-    processed_frame_a, zone_triggered = tracker.process_frame(frame_a)
+    processed_frame_a, zone_triggered, theft_detected = tracker.process_frame(frame_a)
     a_frame.image(processed_frame_a, use_container_width=True)
 
-    # 💡 사람이 구역에 들어오면 카메라 A 루프를 즉시 탈출합니다!
-    if zone_triggered:
-        b_status_msg.warning("🚨 고객 접근 감지! 계산대 카메라 활성화")
-        time.sleep(1.5)  # 자연스러운 화면 전환을 위한 대기 시간
+    # 도난 신호 받아서 에러 띄우기
+    # 💡 2. 도난이 감지되었을 때!
+    if theft_detected:
+        # 화면 오른쪽 아래에서 팝업 띄움
+        st.toast("도난 발생!", icon="🚨")
+        go_to_kiosk = False
+        time.sleep(2)
         break
+
+    # 사람이 구역에 정상적으로 들어오면 카메라 B로 전환
+    if zone_triggered:
+        b_status_msg.warning("고객 접근 감지. 계산대 카메라가 활성화 됩니다.")
+        go_to_kiosk = True
+        time.sleep(1.5)
+        break
+
+#도난이 발생한 경우
+if not go_to_kiosk:
+    st.error("🛑도난 의심")
+    st.stop()
 
 cap_a.release()
 
