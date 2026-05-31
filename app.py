@@ -5,6 +5,9 @@ from ultralytics import YOLO
 from collections import Counter
 import time
 
+# 💡 1단계에서 만든 사람 추적 모듈 불러오기
+from person_tracker import PersonTracker
+
 # ─── 라벨 한글 변환 맵 ───────────────────────────────────
 LABEL_MAP = {
     'yangparing': '양파링',
@@ -62,12 +65,12 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("A화면: 매장 전경 및 행동 분석")
-    st.image("test_images/store_view.png", use_container_width=True)
+    # 💡 수정 포인트 1: 정지 이미지를 지우고 카메라 A 영상이 재생될 빈 공간을 만듭니다.
+    a_frame = st.empty()
 
 
     @st.fragment
     def render_threshold_slider():
-        # 슬라이더 추가: 최소 0.0, 최대 1.0, 초기값 0.25, 간격 0.05
         conf = st.slider(
             "Confidence 임계값 설정",
             min_value=0.0,
@@ -81,13 +84,12 @@ with col1:
 
     render_threshold_slider()
 
-
 with col2:
     st.subheader("B화면: 계산대 상품 인식")
     b_frame = st.empty()
     st.markdown("#### [ 계산대 인식 결과 ]")
     b_table = st.empty()
-    b_status_msg = st.empty()  # 💡 상태 메시지 레이아웃 공간
+    b_status_msg = st.empty()
 
 st.markdown("---")
 
@@ -114,6 +116,38 @@ with st.sidebar:
     render_sidebar_status()
 
 # ─── 🚀 영상 처리 및 AI 추론 루프 ───────────────────────
+# ─── 🚀 영상 처리 및 AI 추론 루프 ───────────────────────
+# 초기화 시 관심구역 비율을 발 위치에 맞게 깔끔하게 넘겨줍니다
+tracker = PersonTracker(roi_ratio=[0.73, 0.50, 0.99, 0.66])
+
+video_a_path = "videos/cctv_view.mp4"
+cap_a = cv2.VideoCapture(video_a_path)
+
+b_status_msg.info("⏳ 고객의 키오스크 접근을 대기 중입니다...")
+
+frame_count_a = 0
+
+while cap_a.isOpened():
+    ret_a, frame_a = cap_a.read()
+    if not ret_a:
+        break
+
+    frame_count_a += 1
+    if frame_count_a % 3 != 0:
+        continue
+
+        # 💡 수정된 부분: 이미지와 함께 구역 진입 여부 신호를 받아옵니다
+    processed_frame_a, zone_triggered = tracker.process_frame(frame_a)
+    a_frame.image(processed_frame_a, use_container_width=True)
+
+    # 💡 사람이 구역에 들어오면 카메라 A 루프를 즉시 탈출합니다!
+    if zone_triggered:
+        b_status_msg.warning("🚨 고객 접근 감지! 계산대 카메라 활성화")
+        time.sleep(1.5)  # 자연스러운 화면 전환을 위한 대기 시간
+        break
+
+cap_a.release()
+
 model = YOLO("models/best_v1.pt")
 snack_names = model.names
 
@@ -126,7 +160,6 @@ frame_idx = 0
 last_boxes = []
 last_detected = []
 
-# 영상이 재생되는 동안의 초기 UI 메시지 설정
 b_status_msg.info("⏳ 계산대 물품 확인 중")
 
 pick_str = ['양파링', '오징어땅콩', '포카칩']
@@ -141,7 +174,7 @@ with c_result.container():
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
-        break  # 영상이 끝나면 루프를 빠져나갑니다.
+        break
 
     frame_idx += 1
     display = cv2.resize(frame, (1280, 720))
@@ -164,18 +197,14 @@ while cap.isOpened():
         last_boxes = deduplicate_by_iou(raw_boxes, iou_threshold=0.3)
         last_detected = sorted([LABEL_MAP.get(b[4], b[4]) for b in last_boxes])
 
-    # ─── 바운딩 박스 그리기 ───────────────────────
     for (x1, y1, x2, y2, label, conf, color) in last_boxes:
         cv2.rectangle(display, (x1, y1), (x2, y2), color, 2)
-        #  LABEL_MAP을 빼고 원래 영어 label 변수를 그대로 출력합니다.
         cv2.putText(display, f"{label} {conf:.2f}", (x1, y1 - 8),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
-    # ✅ B화면 영상 표시
     rgb_frame = cv2.cvtColor(display, cv2.COLOR_BGR2RGB)
     b_frame.image(rgb_frame, use_container_width=True)
 
-    # ✅ 테이블 업데이트 (영상 재생 중에는 "인식 중...")
     if last_detected:
         counts = Counter(last_detected)
         check_data = {
@@ -189,8 +218,6 @@ while cap.isOpened():
 
 cap.release()
 
-# ─── ⏱️ 영상 종료 후 5초 카운트다운 타이머 구간 ───────────────────
-# 영상이 끝나면 테이블의 상태를 "인식 완료"로 먼저 바꿉니다.
 if last_detected:
     counts = Counter(last_detected)
     check_data = {
@@ -200,15 +227,12 @@ if last_detected:
     }
     b_table.table(pd.DataFrame(check_data))
 
-# 5초 동안 대기하면서 초단위로 UI 변경
 for seconds_left in range(5, 0, -1):
     b_status_msg.warning(f"⏳ **계산중...**")
     time.sleep(1)
 
-# ─── 🛑 5초 경과 후 최종 "계산 완료" 및 C화면 전환 ──────────────────
 b_status_msg.success("🎉 **계산 완료**")
 
-# B화면 테이블 상태도 최종 "계산 완료"로 갱신
 if last_detected:
     counts = Counter(last_detected)
     check_data = {
@@ -218,7 +242,6 @@ if last_detected:
     }
     b_table.table(pd.DataFrame(check_data))
 
-# C화면 계산 일치/불일치 판독 및 결과 업데이트
 pick_counter = Counter(pick_str)
 detected_counter = Counter(last_detected)
 missing_counter = pick_counter - detected_counter
