@@ -11,8 +11,10 @@ import numpy as np
 # ═══════════════════════════════════════════════════════
 VIDEO_A_PATH = "videos/구매영상.mp4"
 VIDEO_B_PATH = "videos/계산대.mp4"
+
 #VIDEO_A_PATH = "videos/구매누락.mp4"
 #VIDEO_B_PATH = "videos/계산대_누락.mp4"
+
 #VIDEO_A_PATH = "videos/도난영상.mp4"
 MODEL_HAND   = "models/hand_yolov8n.pt"
 MODEL_ITEM   = "models/best.pt"
@@ -26,10 +28,11 @@ EXCLUDE_ZONE      = (567, 98, 668, 359)
 PICK_SECONDS      = 0.5
 PERSON_CONF       = 0.3
 ALIAS_DIST        = 80
-CHECKOUT_ZONE     = (12, 55, 153, 182)
-CHECKOUT_MIN_STAY = 6.0
-FINAL_MIN_SECONDS = 6.0
-B_PAYMENT_DELAY   = 8.0
+CHECKOUT_ZONE     = (102, 42, 229, 136)#구매,누락
+#CHECKOUT_ZONE     = (36, 97, 154, 195)#도난
+CHECKOUT_MIN_STAY = 5.0
+FINAL_MIN_SECONDS = 5.0
+B_PAYMENT_DELAY   = 7.0
 MAX_LOST_FRAMES   = 30
 FRAME_SKIP        = 2
 RESIZE_W          = 640
@@ -197,8 +200,6 @@ def run_screen_b(item_model, pickup_items, b_frame_ph, b_status_msg,
                               else f"⚠️ 누락 물품: {', '.join(missing_kr)}")
                 add_log(result_msg, "ok" if not missing_kr else "danger")
                 b_status_msg.success("🎉 계산 완료")
-                time.sleep(3)
-                break
 
     cap_b.release()
     if not payment_items:
@@ -297,6 +298,7 @@ ITEM_CLASSES = item_model.names
 
 permanent_trails  = defaultdict(list)
 person_snapshots  = {}
+person_first_seen = {}
 last_seen_items   = {}
 confirmed_picks   = set()
 accumulated_time  = {}
@@ -324,12 +326,12 @@ try:
         h, w = frame.shape[:2]
         frame = cv2.resize(frame, (RESIZE_W, int(h * RESIZE_W / w)))
 
-        hand_res   = hand_model(frame, verbose=False, imgsz=640,
+        hand_res   = hand_model(frame, verbose=False, imgsz=1280,
                                 conf=0.3, device=DEVICE)[0]
-        item_res   = item_model(frame, verbose=False, imgsz=640,
+        item_res   = item_model(frame, verbose=False, imgsz=1280,
                                 conf=item_conf, device=DEVICE)[0]
         person_res = person_model.track(frame, persist=True, verbose=False,
-                                        imgsz=640, conf=PERSON_CONF,
+                                        imgsz=1280, conf=PERSON_CONF,
                                         classes=[0], tracker="bytetrack.yaml",
                                         device=DEVICE)[0]
 
@@ -372,16 +374,21 @@ try:
                 current_pids.add(canonical)
                 lost_counter[canonical]=0
 
-                # 처음 감지 시 컬러 스냅샷 저장
+                # 처음 감지 시 시각 기록 → 3초 후 스냅샷 저장
                 if canonical not in person_snapshots:
-                    x1s,y1s,x2s,y2s = map(int, pbox)
-                    x1c=max(0,x1s-20); y1c=max(0,y1s-20)
-                    x2c=min(frame.shape[1],x2s+20)
-                    y2c=min(frame.shape[0],y2s+20)
-                    crop = frame[y1c:y2c, x1c:x2c]
-                    if crop.size > 0:
-                        person_snapshots[canonical] = cv2.cvtColor(
-                            crop, cv2.COLOR_BGR2RGB)
+                    if canonical not in person_first_seen:
+                        person_first_seen[canonical] = now  # 첫 감지 시각 기록
+                    elif now - person_first_seen[canonical] >= 3.0:
+                        # 3초 경과 후 스냅샷 저장
+                        x1s, y1s, x2s, y2s = map(int, pbox)
+                        x1c = max(0, x1s - 20);
+                        y1c = max(0, y1s - 20)
+                        x2c = min(frame.shape[1], x2s + 20)
+                        y2c = min(frame.shape[0], y2s + 20)
+                        crop = frame[y1c:y2c, x1c:x2c]
+                        if crop.size > 0:
+                            person_snapshots[canonical] = cv2.cvtColor(
+                                crop, cv2.COLOR_BGR2RGB)
 
         for pid in prev_tracked_pids - current_pids:
             lost_counter[pid] += 1
@@ -510,7 +517,7 @@ try:
 
         cx1,cy1,cx2,cy2=CHECKOUT_ZONE
         cv2.rectangle(frame,(cx1,cy1),(cx2,cy2),(0,255,128),2)
-        cv2.putText(frame,"CHECKOUT",(cx1,cy1-8),
+        cv2.putText(frame,"COUNTER",(cx1,cy1-8),
                     cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,128),1)
 
         for tid,pbox in tracked_persons:
