@@ -55,8 +55,10 @@ def put_text_kr(frame, text, pos, font_size=20, color=(255,255,255)):
         font = ImageFont.truetype(FONT_PATH, font_size)
     except:
         font = ImageFont.load_default()
+    # BGR → RGB 변환
     img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(img)
+    # color는 BGR이므로 RGB로 변환
     draw.text(pos, text, font=font, fill=(color[2], color[1], color[0]))
     return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
