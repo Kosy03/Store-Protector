@@ -1,6 +1,6 @@
 import cv2
 
-VIDEO_PATH = "videos/최종.mp4"
+VIDEO_PATH = "videos/구매영상.mp4"
 
 cap = cv2.VideoCapture(VIDEO_PATH)
 ret, frame = cap.read()
