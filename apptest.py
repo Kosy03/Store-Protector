@@ -19,11 +19,11 @@ MODEL_ITEM   = "models/best.pt"
 # ═══════════════════════════════════════════════════════
 GHOST_TTL         = 0
 NEAR_MARGIN       = 10
-EXCLUDE_ZONE      = (389, 316, 465, 391)
+EXCLUDE_ZONE      = (743, 213, 853, 481)
 PICK_SECONDS      = 0.5
 PERSON_CONF       = 0.4
 ALIAS_DIST        = 80
-CHECKOUT_ZONE     = (138, 55, 291, 163)
+CHECKOUT_ZONE     = (232, 110, 349, 220)
 CHECKOUT_MIN_STAY = 3.0
 FINAL_MIN_SECONDS = 5.0
 B_PAYMENT_DELAY   = 5.0
@@ -450,13 +450,17 @@ try:
             cv2.rectangle(frame,(x1,y1),(x2,y2),(0,100,255),2)
             frame=put_text_kr(frame, kr(cn), (x1,max(y1-25,0)), 18, (0,100,255))
 
-        picking_kr=[kr(i) for i in picking_items]
-        cv2.putText(frame,
-                    f"PICKING: {', '.join(picking_kr)}!" if picking_kr else "Monitoring...",
-                    (10,50),cv2.FONT_HERSHEY_SIMPLEX,0.6,
-                    (0,0,255) if picking_kr else (200,200,200),2)
-        cv2.putText(frame,f"frame:{frame_num}  persons:{len(tracked_persons)}",
-                    (10,25),cv2.FONT_HERSHEY_SIMPLEX,0.45,(200,200,200),1)
+        picking_kr = [kr(i) for i in picking_items]
+
+        status_text = f"PICKING: {', '.join(picking_kr)}!" if picking_kr else "Monitoring..."
+
+        status_color = (0, 0, 255) if picking_kr else (200, 200, 200)
+
+        frame = put_text_kr(frame, status_text, (10, 50), 20, status_color)
+
+        cv2.putText(frame, f"frame:{frame_num}  persons:{len(tracked_persons)}",
+
+                    (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1)
 
         a_frame.image(cv2.cvtColor(frame,cv2.COLOR_BGR2RGB), use_container_width=True)
         log_box.text("\n".join(st.session_state.event_log[-15:]))
