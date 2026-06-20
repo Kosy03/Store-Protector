@@ -38,29 +38,41 @@ Store-Protector는 AI 기반 객체 탐지 기술을 활용하여 무인 매장�
 
 ### 상품 집기 감지
 
-> [실행 화면 캡처 삽입]
+> <img width="2692" height="1256" alt="image" src="https://github.com/user-attachments/assets/e5fac928-677a-40d0-8c31-7e90f86f4bf7" />
+
 >
 > * 고객이 상품을 집는 순간 감지
 > * 상품명과 인식 시간을 표시
 
 ### 정상 결제 결과
 
-> [실행 화면 캡처 삽입]
+> <img width="2692" height="1198" alt="image" src="https://github.com/user-attachments/assets/4893bc93-9d43-4227-8411-9bce29eb7f70" />
 >
 > * 매장에서 집은 상품과 계산대에서 결제한 상품이 일치하는 경우
 
 ### 구매 누락 탐지
 
-> [실행 화면 캡처 삽입]
+#### 1. 구매 누락 (집은 물품과 계산한 물품에 차이가 날 경우)
+> <img width="2674" height="1266" alt="image" src="https://github.com/user-attachments/assets/0354db5c-f6c1-4f1e-894a-797378cacf32" />
+> <img width="2686" height="1246" alt="image" src="https://github.com/user-attachments/assets/9bc8cf05-a8fd-4aee-bb05-9d4f3f6bb921" />
+> <img width="2672" height="1150" alt="image" src="https://github.com/user-attachments/assets/ed760378-d040-474f-908a-2235fc61d90a" />
+
+#### 2. 도난 의심 (집은 물품이 있었고 계산대에 간 흔적이 있지만 계산대 카메라에서 아무런 상품이 찍히지 않은 경우)
+> <img width="2674" height="1238" alt="image" src="https://github.com/user-attachments/assets/31a2fe0d-7bfe-426e-9512-6df2630d8a43" />
+> <img width="2658" height="1174" alt="image" src="https://github.com/user-attachments/assets/b6a3bf0c-2ed6-43c9-96db-e1053f5240df" />
+
 >
 > * 계산되지 않은 상품이 존재하는 경우 경고 발생
 
 ### 도난 감지 결과
 
-> [실행 화면 캡처 삽입]
+> <img width="2686" height="1248" alt="image" src="https://github.com/user-attachments/assets/95ca7a5c-7c22-4569-b8c5-5c1fcb1f11ee" />
+> <img width="2668" height="1278" alt="image" src="https://github.com/user-attachments/assets/bd11b3b7-4121-4ca6-b4c3-662369147a5b" />
+> <img width="2692" height="1266" alt="image" src="https://github.com/user-attachments/assets/5ae0ad4f-7535-4d15-86c6-3715013fc553" />
+
 >
 > * 상품을 소지한 상태로 계산 없이 퇴장한 경우
-> * 인물 스냅샷 및 이동 경로 표시
+> * 인물 스냅샷 및 이동 경로 표시 (계산대에 가지 않았다는 사실 확인)
 
 ---
 
@@ -170,6 +182,17 @@ source venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+#### torch 설치 방법
+cmd를 켜고
+```bash
+nvidia-smi
+```
+CUDA Version 확인.
+12 이상이라면 터미널에서
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+(CUDA Version에 맞는 torch 설치)
 
 ### 5) 모델 파일 준비
 
@@ -304,6 +327,7 @@ Store-Protector
 │   ├── 계산대.mp4
 |   ├── 구매누락.mp4
 │   ├── 계산대_누락.mp4
+|   ├── 빈계산대.mp4
 |   └── 도난영상.mp4
 │
 ├── snapshots/
@@ -329,14 +353,14 @@ Store-Protector
 
 | 이름  | 담당 역할                                                                                                                                                                                                       |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 고서연 | 상품 데이터 수집, 상품 6종 촬영, 데이터 라벨링, YOLO 학습 데이터셋 구축, 객체 탐지 모델(best.pt) 학습 및 성능 검증, Streamlit 기반 사용자 인터페이스(UI) 개발, 다중 카메라 연동 시스템 구현, 시나리오 기반의 매장 도난 의심 행위 감지 알고리즘 개발, 상품 집기(Pick-up) 행동 분석 알고리즘 설계|
-| 이하영 | Streamlit 기반 사용자 인터페이스(UI) 개발, 사람·손·상품 객체 탐지 로직 구현, ByteTrack 기반 사용자 추적 기능 구현, 상품 집기(Pick-up) 행동 분석 알고리즘 개발, 계산대 상품 인식 연동, 구매 상품-결제 상품 비교 로직 구현, 구매 누락 및 도난 탐지 기능 구현, 이벤트 로그 관리, 스냅샷 저장 기능 구현, 시스템 통합 및 테스트 |
+| 고서연 | 상품 데이터 수집, 상품 3종 촬영, 데이터 라벨링, YOLO 학습 데이터셋 구축, 객체 탐지 모델(best.pt) 학습 및 성능 검증, Streamlit 기반 사용자 인터페이스(UI) 개발, 다중 카메라 연동 시스템 구현, 시나리오 기반의 매장 도난 의심 행위 감지 알고리즘 개발, 상품 집기(Pick-up) 행동 분석 알고리즘 설계|
+| 이하영 | 상품 3종 촬영, Streamlit 기반 사용자 인터페이스(UI) 개발, 사람·손·상품 객체 탐지 로직 구현, ByteTrack 기반 사용자 추적 기능 구현, 상품 집기(Pick-up) 행동 분석 알고리즘 개발, 계산대 상품 인식 연동, 집은 상품-결제 상품 비교 로직 구현, 구매 누락 및 도난 탐지 기능 구현, 이벤트 로그 관리, 스냅샷 저장 기능 구현, 시스템 통합 및 테스트 |
 
 ### 역할 상세 설명
 
 #### 고서연
 
-* 상품 6종 데이터 촬영
+* 상품 3종 데이터 촬영
 * 객체 탐지용 데이터셋 구축
 * 데이터 라벨링 수행
 * YOLO 모델 학습
@@ -348,6 +372,7 @@ Store-Protector
 
 #### 이하영
 
+* 상품 3종 촬영
 * 전체 시스템 설계 및 구현
 * Streamlit 기반 실시간 관제 화면 개발
 * YOLO를 활용한 사람, 손, 상품 탐지 기능 구현
