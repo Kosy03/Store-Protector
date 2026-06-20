@@ -14,7 +14,7 @@ Store-Protector는 AI 기반 객체 탐지 기술을 활용하여 무인 매장�
 * ByteTrack 기반 고객 추적(Person Tracking)
 * 상품 집기(Pick-up) 행동 인식
 * 계산대 상품 인식
-* 구매 상품과 결제 상품 비교
+* 집은 상품과 결제 상품 비교
 * 구매 누락 탐지
 * 도난 의심 상황 탐지
 * 실시간 Streamlit 대시보드 제공
@@ -27,7 +27,11 @@ Store-Protector는 AI 기반 객체 탐지 기술을 활용하여 무인 매장�
 
 ### 메인 대시보드
 
-> [실행 화면 캡처 삽입]
+> <img width="2714" height="1036" alt="image" src="https://github.com/user-attachments/assets/8d71e337-3cb3-4451-83c5-5fe86b4b9f57" />
+> <img width="2658" height="1292" alt="image" src="https://github.com/user-attachments/assets/cc2cbd3a-62a0-4c29-9b66-bac946d669d5" />
+> <img width="2692" height="1198" alt="image" src="https://github.com/user-attachments/assets/4893bc93-9d43-4227-8411-9bce29eb7f70" />
+
+
 >
 > * Streamlit 기반 실시간 관제 화면
 > * A화면(매장 CCTV), B화면(계산대 CCTV), C화면(최종 판독 결과)
@@ -184,6 +188,7 @@ videos/
  ├── 계산대.mp4
  ├── 구매누락.mp4
  ├── 계산대_누락.mp4
+ ├── 빈계산대.mp4
  └── 도난영상.mp4
 ```
 'https://drive.google.com/drive/folders/1GCWH0JzN2JNwVEpAmFkeDhF2rk7qjRem?usp=sharing'
