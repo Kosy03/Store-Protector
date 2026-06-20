@@ -216,7 +216,12 @@ videos/
 'https://drive.google.com/drive/folders/1GCWH0JzN2JNwVEpAmFkeDhF2rk7qjRem?usp=sharing'
 
 ### 7) 실행
-
+```bash
+결제/누락/도난 상황별 설정
+#VIDEO_A_PATH : A화면
+#VIDEO_B_PATH : B화면
+#CHECKOUT_ZONE : 계산대 위치
+```
 ```bash
 streamlit run app.py
 ```
