@@ -137,13 +137,12 @@ Pillow
 ### requirements.txt
 
 ```txt
-streamlit
-pandas
-opencv-python
-torch
-ultralytics
-numpy
-Pillow
+ultralytics==8.4.48
+streamlit==1.58.0
+opencv-python==4.13.0.92
+pillow==12.2.0
+numpy==2.4.6
+pandas==3.0.3
 ```
 
 ---
