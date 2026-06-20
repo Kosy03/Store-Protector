@@ -66,7 +66,7 @@ Store-Protector는 AI 기반 객체 탐지 기술을 활용하여 무인 매장�
 
 ### 도난 감지 결과
 
-> <img width="2686" height="1248" alt="image" src="https://github.com/user-attachments/assets/95ca7a5c-7c22-4569-b8c5-5c1fcb1f11ee" />
+> <img width="2704" height="1236" alt="image" src="https://github.com/user-attachments/assets/f6a79213-4b22-4dab-8cf0-b394ad85c968" />
 > <img width="2668" height="1278" alt="image" src="https://github.com/user-attachments/assets/bd11b3b7-4121-4ca6-b4c3-662369147a5b" />
 > <img width="2692" height="1266" alt="image" src="https://github.com/user-attachments/assets/5ae0ad4f-7535-4d15-86c6-3715013fc553" />
 
