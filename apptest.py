@@ -19,8 +19,8 @@ import numpy as np
 #  경로 설정
 # ═══════════════════════════════════════════════════════
 #1. 계산 완료 상황
-#VIDEO_A_PATH = "videos/구매영상.mp4"
-#VIDEO_B_PATH = "videos/계산대.mp4"
+VIDEO_A_PATH = "videos/구매영상.mp4"
+VIDEO_B_PATH = "videos/계산대.mp4"
 
 #2. 계산 누락 상황
 #VIDEO_A_PATH = "videos/구매누락.mp4"
@@ -31,11 +31,11 @@ import numpy as np
 #VIDEO_B_PATH = "videos/빈계산대.mp4"
 
 #4. 도난 상황
-VIDEO_A_PATH = "videos/도난영상.mp4"
+#VIDEO_A_PATH = "videos/도난영상.mp4"
 
 # 계산대 위치 설정
-#CHECKOUT_ZONE     = (102, 42, 229, 150)#구매,누락
-CHECKOUT_ZONE     = (36, 97, 154, 195)#도난
+CHECKOUT_ZONE     = (102, 42, 229, 150)#구매,누락
+#CHECKOUT_ZONE     = (36, 97, 154, 195)#도난
 
 MODEL_HAND   = "models/hand_yolov8n.pt"
 # [설명] MODEL_HAND : 손(hand)만 전용으로 탐지하는 모델 (공개 데이터셋으로 학습됨)
