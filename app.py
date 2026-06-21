@@ -12,7 +12,6 @@ import pandas as pd
 import cv2, torch, time, os
 from collections import defaultdict, deque, Counter
 
-from sympy import false
 from ultralytics import YOLO
 from PIL import ImageFont, ImageDraw, Image
 import numpy as np
@@ -40,7 +39,7 @@ VIDEO_B_PATH = "videos/계산대.mp4"
 CHECKOUT_ZONE     = (102, 42, 229, 150)#구매,누락
 #CHECKOUT_ZONE     = (36, 97, 154, 195)#도난
 
-MODEL_HAND   = "models/hand_yolov8n_new.pt"
+MODEL_HAND   = "models/hand_yolov8n.pt"
 # [설명] MODEL_HAND : 손(hand)만 전용으로 탐지하는 모델 (공개 데이터셋으로 학습됨)
 MODEL_ITEM   = "models/best.pt"
 # [설명] MODEL_ITEM : 직접 촬영/라벨링한 과자·음료 6종 상품 탐지 커스텀 모델
@@ -659,18 +658,15 @@ try:
                             pid: pb for pid, (pb, t) in person_last_box.items()
                             if now - t <= ALIAS_MEMORY_SECONDS
                         }
-                        print(f"[DEBUG] 새 ID={tid} 위치=({cx},{cy}) | 후보 수={len(candidates)}")
                         matched = False
                         for pp, pb in candidates.items():
                             pcx, pcy = int(box_center(pb)[0]), int(box_center(pb)[1])
                             dx, dy = abs(cx - pcx), abs(cy - pcy)
-                            print(f"[DEBUG]   후보={pp} 위치=({pcx},{pcy}) dx={dx} dy={dy} (기준 ALIAS_DIST={ALIAS_DIST})")
                             if dx < ALIAS_DIST and dy < ALIAS_DIST:
                                 root = id_alias.get(pp, pp)
                                 id_alias[tid] = root
                                 canonical = root
                                 matched = True
-                                print(f"[DEBUG]   ✅ 매칭 성공: {tid} -> {root}")
                                 for k in list(accumulated_time):
                                     if k[0] == pp and (root, k[1]) not in accumulated_time:
                                         accumulated_time[(root, k[1])] = accumulated_time[k]
