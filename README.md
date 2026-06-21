@@ -57,18 +57,23 @@ Store-Protector는 AI 기반 객체 탐지 기술을 활용하여 무인 매장�
 > <img width="2686" height="1246" alt="image" src="https://github.com/user-attachments/assets/9bc8cf05-a8fd-4aee-bb05-9d4f3f6bb921" />
 > <img width="2672" height="1150" alt="image" src="https://github.com/user-attachments/assets/ed760378-d040-474f-908a-2235fc61d90a" />
 
-#### 2. 도난 의심 (집은 물품이 있었고 계산대에 간 흔적이 있지만 계산대 카메라에서 아무런 상품이 찍히지 않은 경우)
-> <img width="2674" height="1238" alt="image" src="https://github.com/user-attachments/assets/31a2fe0d-7bfe-426e-9512-6df2630d8a43" />
-> <img width="2658" height="1174" alt="image" src="https://github.com/user-attachments/assets/b6a3bf0c-2ed6-43c9-96db-e1053f5240df" />
+#### 2. 도난 의심과 도난 감 (집은 물품이 있었고 계산대에 간 흔적이 있지만 계산대 카메라에서 아무런 상품이 찍히지 않은 경우)
+> <img width="2686" height="1230" alt="image" src="https://github.com/user-attachments/assets/2d5410c8-372d-4188-b8de-49cbb49cb317" />
+
+> <img width="2670" height="1094" alt="image" src="https://github.com/user-attachments/assets/8c5b6e57-5061-4de8-be94-63d70072f63b" />
+> <img width="2594" height="1210" alt="image" src="https://github.com/user-attachments/assets/c565588d-b316-4faa-8b36-e9229afb8015" />
 
 >
 > * 계산되지 않은 상품이 존재하는 경우 경고 발생
 
 ### 도난 감지 결과
 
-> <img width="2704" height="1236" alt="image" src="https://github.com/user-attachments/assets/f6a79213-4b22-4dab-8cf0-b394ad85c968" />
-> <img width="2668" height="1278" alt="image" src="https://github.com/user-attachments/assets/bd11b3b7-4121-4ca6-b4c3-662369147a5b" />
-> <img width="2692" height="1266" alt="image" src="https://github.com/user-attachments/assets/5ae0ad4f-7535-4d15-86c6-3715013fc553" />
+> <img width="2694" height="1288" alt="image" src="https://github.com/user-attachments/assets/31406053-7c99-421d-bb39-95b9d2027ef2" />
+
+> <img width="2654" height="1170" alt="image" src="https://github.com/user-attachments/assets/dc2bfb5e-0263-44ad-a0c8-0e025698e417" />
+
+> <img width="2656" height="1208" alt="image" src="https://github.com/user-attachments/assets/4c9b83fc-cd97-42c6-a5d0-864e0b804832" />
+
 
 >
 > * 상품을 소지한 상태로 계산 없이 퇴장한 경우
@@ -216,7 +221,12 @@ videos/
 'https://drive.google.com/drive/folders/1GCWH0JzN2JNwVEpAmFkeDhF2rk7qjRem?usp=sharing'
 
 ### 7) 실행
-
+```bash
+결제/누락/도난 상황별 설정
+#VIDEO_A_PATH : A화면
+#VIDEO_B_PATH : B화면
+#CHECKOUT_ZONE : 계산대 위치
+```
 ```bash
 streamlit run app.py
 ```
@@ -372,7 +382,6 @@ Store-Protector
 #### 이하영
 
 * 상품 3종 촬영
-* 전체 시스템 설계 및 구현
 * Streamlit 기반 실시간 관제 화면 개발
 * YOLO를 활용한 사람, 손, 상품 탐지 기능 구현
 * ByteTrack을 활용한 고객 추적 기능 구현
