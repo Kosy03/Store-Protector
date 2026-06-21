@@ -201,6 +201,8 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 ```
 (CUDA Version에 맞는 torch 설치)
 
+nvidia가 없다면 그냥 python package에서 torch 다운 받기
+
 ### 5) 모델 파일 준비
 
 ```text
