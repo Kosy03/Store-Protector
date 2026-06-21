@@ -158,7 +158,7 @@ https://www.jetbrains.com/pycharm/download/?section=windows
 https://git-scm.com/install/windows
 
 ### 1) 프로젝트 클론
-
+터미널에서
 ```bash
 git clone https://github.com/Kosy03/Store-Protector.git
 cd store-protector
