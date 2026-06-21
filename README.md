@@ -154,6 +154,8 @@ pandas==3.0.3
 
 ## 5. 상세 설치 및 실행 방법
 **pycharm, git 설치**
+https://www.jetbrains.com/pycharm/download/?section=windows
+https://git-scm.com/install/windows
 
 ### 1) 프로젝트 클론
 
