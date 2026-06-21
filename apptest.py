@@ -37,7 +37,7 @@ VIDEO_B_PATH = "videos/계산대.mp4"
 CHECKOUT_ZONE     = (102, 42, 229, 150)#구매,누락
 #CHECKOUT_ZONE     = (36, 97, 154, 195)#도난
 
-MODEL_HAND   = "models/hand_yolov8n.pt"
+MODEL_HAND   = "models/hand_yolov8n_new.pt"
 # [설명] MODEL_HAND : 손(hand)만 전용으로 탐지하는 모델 (공개 데이터셋으로 학습됨)
 MODEL_ITEM   = "models/best.pt"
 # [설명] MODEL_ITEM : 직접 촬영/라벨링한 과자·음료 6종 상품 탐지 커스텀 모델
